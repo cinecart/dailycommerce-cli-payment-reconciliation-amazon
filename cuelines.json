@@ -1,0 +1,57 @@
+{
+    "cues":[
+        {
+            "parameter":"date",
+            "cuelines":[
+                "Datum",
+                "Date",
+                "Rechnungsdatum",
+                "Rechnungs-Datum",
+                "Abrechnungszeitpunkt"
+            ]
+        },
+        {
+            "parameter":"amount",
+            "cuelines":[
+                "Bruttobetrag",
+                "Bruttoumsatz",
+                "Betrag",
+                "Endbetrag",
+                "Endsumme",
+                "Gesamt",
+                "Gesamtbetrag",
+                "Gesamtbetrag (brutto)",
+                "Gesampreis",
+                "Gesamtpreis Brutto",
+                "Rechnungsbetrag",
+                "Rechnungsbetrag (inkl. Umsatzsteuer)",
+                "Rechnungsbetrag (inkl. MWSt.)",
+                "Summe",
+                "Summe (brutto)",
+                "Total",
+                "Unsere fällige Forderung",
+                "Zahlungsbetrag",
+                "Zahlbetrag",
+                "ZU ZAHLEN EURO",
+                "Zu zahlender Betrag"
+            ]
+        },
+        {
+            "parameter":"invoice_nr",
+            "cuelines":[
+                "Belegnummer",
+                "Beleg-Nr.",
+                "Bon-Nr.",
+                "Invoice Number",
+                "Order ID",
+                "Rechnungsnummer",
+                "Rechnung Nr.",
+                "Rech.-Nr.",
+                "Rechnungs-Nr.",
+                "Rechnungsnr.",
+                "Rechnungsnummer",
+                "Rechnung"
+            ]
+        }
+    ]
+}

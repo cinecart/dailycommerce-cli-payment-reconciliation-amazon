@@ -1,0 +1,21 @@
+{
+    "payments_amazon_DE":"payments-amazon-DE.csv",
+    "payments_amazon_FR":"payments-amazon-FR.csv",
+    "payments_amazon_ES":"payments-amazon-ES.csv",
+    "payments_amazon_IT":"payments-amazon-IT.csv",
+    "payments_amazon_UK":"payments-amazon-UK.csv",
+    "receipts_source":"receipts-source.csv",
+    "result_amazon-fees":"result-amazon-fees.csv",
+    "result_payments_assigned":"result-payments-assigned.csv",
+    "result_report":"result-report.csv",
+
+    "account_DE": "1840",
+    "account_FR": "1841",
+    "account_IT": "1842",
+    "account_ES": "1843",
+    "account_UK": "1844",
+    "amazon_account": "70001",
+    "sales_account": "20018",
+    "account_bank": "1460"
+
+}

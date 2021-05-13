@@ -1,0 +1,11 @@
+venv
+.vscode
+_pycache_
+output
+*.pyc
+*.pdf
+*.csv
+*.ini
+*.htm
+*.png
+*.zip
