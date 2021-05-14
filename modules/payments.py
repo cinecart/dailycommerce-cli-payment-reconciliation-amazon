@@ -137,10 +137,12 @@ class PaymentDB:
             {"text":"Total Paypouts", "amount": self._decimal_tostring(total_payouts)},
             {"text":"Total Fees", "amount": self._decimal_tostring(total_fees)}
         ]
+        report_str = [";Amount"]
         print("{:<25}{:>10}".format("", "AMOUNT"))
         for entry in report:
             print("{:<25}{:>10}".format(entry["text"], entry["amount"]))
-
+            report_str.append(entry["text"] + ";" + entry["amount"])
+        report_str = "\n".join(report_str)
         print()
         print("Saving results...",)
         result_file = self.options.get("result_payments_assigned", "result-payments-assigned.csv")
@@ -150,7 +152,7 @@ class PaymentDB:
         if unassigned:
             unassigned_file = "result-receipts-left.csv"
             self.save_results(unassigned, unassigned_file, self.receipt_schema)
-        self.save_results(report, "result-report.csv", ["", "Amount"])
+        self.save_results(report_str, "result-report.csv", None, istext=True)
         print("done!")
 
         return True
