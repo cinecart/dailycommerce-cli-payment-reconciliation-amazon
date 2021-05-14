@@ -3,11 +3,11 @@
         {
             "parameter":"Sales",
             "cuelines":[
-                "Sales",
+                "Order",
                 "Ordine",
                 "Commande",
                 "Pedido",
-                "Bestellung",
+                "Bestellung"
             ]
         },
         {
@@ -35,6 +35,6 @@
             "cuelines":[
               "Servicegebühr"
             ]
-        },
+        }
     ]
 }

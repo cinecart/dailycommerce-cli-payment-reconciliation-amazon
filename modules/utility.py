@@ -4,7 +4,7 @@ from functools import lru_cache
 from difflib import SequenceMatcher
 
 
-def readcsv(p:'Path', fieldset:list=None) -> list:
+def readcsv(p:'Path', fieldset:list=None, skip_row=0) -> list:
     """
     Load contents of a csv file
 
@@ -25,10 +25,14 @@ def readcsv(p:'Path', fieldset:list=None) -> list:
         raise Exception("Invalid file type {}. Supply a csv file".format(p))
     db = []
     # Read csv file 
+    count = 0
     with pp.open(encoding="utf-8") as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=";")
+        csv_reader = csv.DictReader(csv_file, fieldnames=fieldset, delimiter=";")
         try:
             for row in csv_reader:
+                if count < skip_row:
+                    count += 1
+                    continue
                 db.append(row)
         except csv.Error as e:
             raise Exception('File {}, line {}: {}'.format(str(p), csv_reader.line_num, e))

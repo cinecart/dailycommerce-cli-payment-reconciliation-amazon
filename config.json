@@ -1,6 +1,0 @@
-{
-    "receipt_dir":"receipts_source",
-    "payment_source":"payment_source",
-    "account_list_file":"account-list.csv",
-    "output":"results"
-}

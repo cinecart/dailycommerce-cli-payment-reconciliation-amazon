@@ -1,2 +1,0 @@
-pymupdf==1.18.10
-rapidfuzz==1.4.1

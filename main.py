@@ -69,29 +69,8 @@ def parse_comand_line(dir_path: 'Path') -> 'Namespace':
         "-c",
         "--config",
         dest="config",
-        default=dir_path / "config.json",
+        default=dir_path / "dailycommerce-cli-payment-reconciliation-amazon-config.json",
         help="Path to configuration file",
-    )
-    parser.add_argument(
-        "-r",
-        "--receipts",
-        dest="receipt_dir",
-        help="Path to the directory with receipts."
-        "Overrides the value from your configuration file.",
-    )
-    parser.add_argument(
-        "-p",
-        "--payments",
-        dest="payment_source",
-        help="Path to the payment source directory or file."
-        "Overrides the value from your configuration file.",
-    )
-    parser.add_argument(
-        "-a",
-        "--accounts",
-        dest="account_list_file",
-        help="Path to the account-list file."
-        "Overrides the value from your configuration file.",
     )
     
     args = parser.parse_args()
@@ -109,16 +88,9 @@ def main():
     payment_source = config["payment_source"]
     source_files = all_files_with_ext(payment_source, ".csv")
     payment_db = PaymentDB(source_files, config)
-    # First LOOP
-    payment_db._first_run()
-    # Second LOOOP
-    pdf_dir = config["receipt_dir"]
-    source_pdfs = all_files_with_ext(pdf_dir,".pdf")
-    payment_db._second_run(source_pdfs)
-    # # Third LOOP
-    payment_db._third_run()
-
-    if payment_db.save_results():
+    payment_db.load_payments()
+    
+    if payment_db.process():
         print("All done in {} seconds".format(time.time() - tt))
         
 
