@@ -25,9 +25,20 @@ def readcsv(p:'Path', fieldset:list=None, skip_row=0) -> list:
         raise Exception("Invalid file type {}. Supply a csv file".format(p))
     db = []
     # Read csv file 
+    line = ""
+    delim = ","
+    with open(pp, encoding="utf-8") as f:
+        line = f.readlines()[skip_row:skip_row + 1]
+    if line:
+        num1 = line[0].count(";")
+        num2 = line[0].count(",")
+        delim = ";" if num1 > num2 else ","
+    else:
+        raise Exception("File {} is empty".format(p))
+
     count = 0
     with pp.open(encoding="utf-8") as csv_file:
-        csv_reader = csv.DictReader(csv_file, fieldnames=fieldset, delimiter=";")
+        csv_reader = csv.DictReader(csv_file, fieldnames=fieldset, delimiter=delim)
         try:
             for row in csv_reader:
                 if count < skip_row:

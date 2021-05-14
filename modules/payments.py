@@ -1,18 +1,14 @@
-from os import pipe
+
 import sys
 import re
 import typing
 import json
 from datetime import datetime
 from decimal import Decimal
-from collections import Counter
 from pathlib import Path
 from shutil import copy2
 from collections import defaultdict
 
-from pprint import pprint
-
-#from .fuzzlogic import FuzzLogic
 
 from .utility import printProgressBar, readcsv, save_csv, file_with_suffix, file_with_prefix, create_directory
 
@@ -53,12 +49,16 @@ class PaymentDB:
         total_fees = 0
         total_payouts = 0
         total_reimbursements = 0
+        total_payments = 0
 
         for store in self.db:
+            print()
             lang = store['lang']
             payments = store['payments']
             account = store['account']
+            print("Processing {}...".format(store["file"]), end="")
             for payment in payments:
+                total_payments += 1
                 res = _schema.copy()
                 order = payment["order id"]
                 summa = self._parse_decimal(payment["product sales"])
@@ -124,6 +124,10 @@ class PaymentDB:
                 res["Zusatzinformation"] = payment_type                         # "type"
 
                 result.append(res)
+            print("...done!")
+
+        print()
+        print("Payments processed: {}".format(total_payments))
 
         assigned = list(filter(lambda x: x["assigned"], self.receipts))
         unassigned = list(filter(lambda x: not x["assigned"], self.receipts))
@@ -173,6 +177,7 @@ class PaymentDB:
 
 
     def load_payments(self):
+        print()
         options = self.options
         for path in self._source:
             name = path.name
@@ -186,8 +191,8 @@ class PaymentDB:
                 print("[ERROR] {}", format(ex)) 
                 continue
             lang = self._search_in_text(name, r"(?<=[\-_])([A-Z]{2})[_\-\.]")
-            # print(lang)
-            # print("Records: {}".format(len(db)))
+            if lang is None:
+                continue
 
             account_key = "account_" + lang.upper()
             account = options[account_key]
@@ -228,7 +233,6 @@ class PaymentDB:
             sys.exit(ee)
             
         return lines
-
 
 
     def _sorting_key(self, x):
@@ -285,7 +289,6 @@ class PaymentDB:
             output_dir = Path(output_dir)
         if not output_dir.is_dir():
             create_directory(output_dir, self.options["debug"])
-            # TODO: remove source
         result_file = file
         output_path = output_dir / result_file
         if istext:
@@ -308,18 +311,21 @@ class PaymentDB:
         Parse string representing some price into a Decimal
         """      
         regex = re.compile(r'^(?P<sign>-?)(?P<tous>\d{1,3})[^\d](?P<hun>\d{3}),(?P<dec>\d{2})')
-        m = regex.search(raw_str)
-        if m:
-            string_decimal = m.group("sign") + m.group("tous") + m.group("hun") + "." + m.group("dec")
-        else:
-            string_decimal = raw_str.replace(",", ".")
-        try: 
-            result = Decimal(string_decimal)
-            if abs and result < 0:
-                result = 0 - result
+        try:
+            m = regex.search(raw_str)
+            if m:
+                string_decimal = m.group("sign") + m.group("tous") + m.group("hun") + "." + m.group("dec")
+            else:
+                string_decimal = raw_str.replace(",", ".")
+            try: 
+                result = Decimal(string_decimal)
+                if abs and result < 0:
+                    result = 0 - result
+            except Exception as err:
+                print("Can't parse number {}. Unknown format".format(raw_str))
+                result = Decimal(0)
         except Exception as err:
-            print("Can't parse number {}. Unknown format".format(raw_str))
-            result = Decimal(0)
+            return Decimal(0)
         return result
 
     months = {"jan":"01","janv":"01","genn":"01","gen":"01","ene":"01",
