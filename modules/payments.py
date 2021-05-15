@@ -33,8 +33,6 @@ class PaymentDB:
     def __init__(self, source, options):       
         self._source = source
         self.options = options
-        self._schema = ["Umsatz in Euro","Steuerschlüssel","Gegenkonto","Beleg1","Beleg2","Datum","Konto","Kost1","Kost2",
-        "Skonto in Euro","Buchungstext","Umsatzsteuer-ID","Zusatzart","Zusatzinformation"]
         self.db = []
         self.receipts = self.load_receipts(options["receipt_source"])
         self.cues = self.get_cuelines('dailycommerce-cli-payment-reconciliation-amazon-cuelines.json')
@@ -50,6 +48,7 @@ class PaymentDB:
         total_payouts = 0
         total_reimbursements = 0
         total_payments = 0
+        total_sale_fees = 0
 
         for store in self.db:
             print()
@@ -111,6 +110,7 @@ class PaymentDB:
                     fee["Konto"] = account                                    
                     fee["Buchungstext"] = description 
                     fee["Zusatzinformation"] = payment_type
+                    total_sale_fees = total_sale_fees + fees
                     fees_result.append(fee)
     
                 res["Umsatz in Euro"] = self._decimal_tostring(total)           # "product sales" + "postage credits" / "total" for transfers
@@ -134,12 +134,13 @@ class PaymentDB:
         print()
         print("Assigned {} receipts".format(len(assigned)))
         print("Unassigned receipts left: {}".format(len(unassigned)))
-
+        total_payouts = 0 - total_payouts
         report =[
             {"text":"Total Sales", "amount": self._decimal_tostring(total_sales)},
             {"text":"Total Reimboursements", "amount": self._decimal_tostring(total_reimbursements)},
             {"text":"Total Paypouts", "amount": self._decimal_tostring(total_payouts)},
-            {"text":"Total Fees", "amount": self._decimal_tostring(total_fees)}
+            {"text":"Total Fees", "amount": self._decimal_tostring(total_fees)},
+            {"text":"Total Sale Fees", "amount": self._decimal_tostring(total_sale_fees)}
         ]
         report_str = [";Amount"]
         print("{:<25}{:>10}".format("", "AMOUNT"))
@@ -192,6 +193,7 @@ class PaymentDB:
                 continue
             lang = self._search_in_text(name, r"(?<=[\-_])([A-Z]{2})[_\-\.]")
             if lang is None:
+                print("WARNING: COULD NOT DETECT LANGUAGE IN THE NAME", end="\n")
                 continue
 
             account_key = "account_" + lang.upper()
@@ -322,6 +324,7 @@ class PaymentDB:
                 if abs and result < 0:
                     result = 0 - result
             except Exception as err:
+                print()
                 print("Can't parse number {}. Unknown format".format(raw_str))
                 result = Decimal(0)
         except Exception as err:
@@ -360,9 +363,8 @@ class PaymentDB:
             dt = datetime(year, month, day, hour, min, sec)
             return dt
         except Exception as err:
-            print(err)
-            print(date_str)
-            print(m)
+            print()
+            print("WARNING: UNKNOWN DATE FORMAT {}".format(date_str))
             pass
         try:
             dt = datetime.fromisoformat(date_str)
