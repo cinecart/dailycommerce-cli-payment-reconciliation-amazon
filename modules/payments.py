@@ -69,7 +69,7 @@ class PaymentDB:
                 gegenkonto = None
                 beleg1 = None
                 total = self._parse_decimal(payment["total"])
-             
+                is_refund = False
                 if payment_type in self.cues["Payouts"]:
                     # transfer
                     gegenkonto = self.options["account_bank"]
@@ -83,12 +83,13 @@ class PaymentDB:
                     total = summa + shiping
                     if payment_type in self.cues["Refund"]:
                         total_reimbursements = total_reimbursements + total
+                        is_refund = True
                     else:
                         total_sales = total_sales + total                    
 
                 total_receipts = None
                 if order:
-                    receipts = self.find_receipt(order)
+                    receipts = self.find_receipt(order, is_refund)
                     if receipts:
                         total_receipts = 0
                         beleg1 = receipts[0]["Beleg1"]
@@ -163,12 +164,18 @@ class PaymentDB:
         return True
 
 
-    def find_receipt(self, order):
+    def find_receipt(self, order, is_refund):
         result = []
         id = None
         for receipt in self.receipts:
             if order == receipt["Zusatzinformation"]:
                 id = receipt["Beleg1"]
+                if is_refund:
+                    id = id.upper().strip()
+                    if id.endswith("-CO"):
+                        break
+                    else:
+                        continue
                 break
         result = list(filter(lambda x: x["Beleg1"] == id, self.receipts))
         for receipt in result:
@@ -330,6 +337,7 @@ class PaymentDB:
         except Exception as err:
             return Decimal(0)
         return result
+        
 
     months = {"jan":"01","janv":"01","genn":"01","gen":"01","ene":"01",
             "febr":"02","feb":"02","févr":"02","fév":"02","fev":"02",
